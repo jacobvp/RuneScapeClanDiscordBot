@@ -1,0 +1,11 @@
+{
+  "name": "RunescapeClanDiscordBot",
+  "version": "0.0.1",
+  "description": "Provides handy clanfeatures",
+  "main": "bot.js",
+  "author": "Jacob van Pouderoijen",
+  "dependencies": {
+    "discord.js": "^11.3.0",
+    "winston": "^2.4.0"
+  }
+}
