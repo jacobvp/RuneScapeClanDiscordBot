@@ -35,10 +35,11 @@ fs.readdir("./commands", (err, files) => {
         logger.info(`Loading ${file}`);
         let command = require(`./commands/${file}`);
         //check if command already exists under any of the aliases
-        if (command.help.names.some(v => bot.commandList.keyArray().some(a => a.includes(v))))
+
+        if (command.settings.names.some(v => bot.commandList.keyArray().some(a => a.includes(v))))
             throw new Error("Command defined twice");
-        if (command.help.enabled)
-            bot.commandList.set(command.help.names, command);
+        if (command.settings.enabled)
+            bot.commandList.set(command.settings.names, command);
     });
 });
 
@@ -62,13 +63,13 @@ bot.on("message", async message => {
     if (message.channel.type === "dm") return;
 
     let messageArray = message.content.split(/\s+/g);
-    let command = messageArray[0];
+    let command = messageArray[0].toLowerCase();
 
     //check if the prefix is the right one
     if (!command.startsWith(globalFunctions.getPrefix(message.guild.id))) return;
 
     //try to find the command
-    let commandToExecute = bot.commandList.find(c => c.help.names.includes(command.slice(1)));
+    let commandToExecute = bot.commandList.find(c => c.settings.names.includes(command.slice(1)));
     if (!commandToExecute) {
         message.channel.send("No such command exists.");
         return;

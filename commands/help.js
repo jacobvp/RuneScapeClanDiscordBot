@@ -1,7 +1,14 @@
-const globalfunctions = require("../globalfunctions.js");
+const globalFunctions = require("../globalfunctions.js");
 const settings = require("../settings.json");
 
 module.exports.run = async (bot, logger, message) => {
+    let messageArray = message.content.split(/\s+/g);
+    let argCheck = globalFunctions.checkArgumentCountAcceptable(messageArray, this.settings.args, message.guild.id);
+    if(!argCheck.result) {
+        message.channel.send(argCheck.message);
+        return;
+    }
+
     //get the list of loaded commands
     let commands = bot.commandList;
 
@@ -9,15 +16,25 @@ module.exports.run = async (bot, logger, message) => {
     let fields = [];
     commands.forEach(c => {
 
-        let mainCommand = c.help.names[0];
-        let aliases = c.help.names.slice(1);
+        let mainCommand = c.settings.names[0];
+        let aliasArray = c.settings.names.slice(1);
+
+        let name = `${globalFunctions.getPrefix(message.guild.id)}${mainCommand}`;
+        let aliases = aliasArray.join() || "-";
+        let description = c.settings.description;
+        let example = `\`${globalFunctions.getPrefix(message.guild.id)}${c.settings.example}\``;
+        let joinedArguments = c.settings.args.join(" ");
+        if(joinedArguments) joinedArguments = "`" + joinedArguments + "`";
+
         let field = {
             //concat the prefix and maincommand
-            name: `${globalfunctions.getPrefix(message.guild.id)}${mainCommand}`,
+            name: name,
             //build the rest of the help-description using discord markup. The \t are tabs to help with layout
-            value:  `*Aliases:*\t\t\t\t${aliases.join() || "-"}` +
-                    `\n*Description*:\t\t${c.help.description}` +
-                    `\n*Usage*:\t\t\t\t\`${globalfunctions.getPrefix(message.guild.id)}${mainCommand} ${c.help.args.join(" ")}\``
+            value: `*__Aliases__*:\t\t\t\t${aliases}` +
+            `\n*__Description__:*\t\t${description}` +
+            `\n\n*__Arguments__:*\t\t${joinedArguments || "-"}` +
+            `\n*__Example__*:\t\t\t ${example}` +
+            `\n\u2063`
         };
         //add the command info to the list
         fields.push(field);
@@ -34,9 +51,10 @@ module.exports.run = async (bot, logger, message) => {
     });
 };
 
-module.exports.help = {
+module.exports.settings = {
     names: ["help", "commands"],
-    description: "Lists the commands",
+    description: "Lists the commands.",
     args: [],
+    example: "help",
     enabled: true
 };

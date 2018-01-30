@@ -1,3 +1,4 @@
 settings.auth.json
 .idea
 guildsettings/*.json
+caps/*.json

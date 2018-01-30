@@ -5,7 +5,10 @@
   "main": "bot.js",
   "author": "Jacob van Pouderoijen",
   "dependencies": {
+    "csvtojson": "^1.1.9",
     "discord.js": "^11.3.0",
+    "moment": "^2.20.1",
+    "request": "^2.83.0",
     "winston": "^2.4.0"
   }
 }

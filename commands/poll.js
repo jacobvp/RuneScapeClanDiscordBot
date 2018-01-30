@@ -1,10 +1,11 @@
+const globalFunctions = require("../globalfunctions.js");
 const settings = require('../settings.json');
 
 module.exports.run = async (bot, logger, message) => {
-    //split the message on spaces
     let messageArray = message.content.split(/\s+/g);
-    if (messageArray.length - 1 < this.help.args.length) {
-        message.channel.send("Provide all the parameters, see `!help` for more information.");
+    let argCheck = globalFunctions.checkArgumentCountAcceptable(messageArray, this.settings.args, message.guild.id);
+    if(!argCheck.result) {
+        message.channel.send(argCheck.message);
         return;
     }
 
@@ -62,9 +63,10 @@ module.exports.run = async (bot, logger, message) => {
     });
 };
 
-module.exports.help = {
+module.exports.settings = {
     names: ["poll"],
     description: "Starts a simple yes/no poll, where voting is done by reactions on the message.",
     args: ["[poll-subject]", "[Time to run poll (in seconds)]"],
+    example: "poll Should we do x? 60",
     enabled: true
 };

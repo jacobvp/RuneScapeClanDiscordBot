@@ -1,6 +1,14 @@
+const globalFunctions = require("../globalfunctions.js");
 const settings = require('../settings');
 
 module.exports.run = async (bot, logger, message) => {
+    let messageArray = message.content.split(/\s+/g);
+    let argCheck = globalFunctions.checkArgumentCountAcceptable(messageArray, this.settings.args, message.guild.id);
+    if(!argCheck.result) {
+        message.channel.send(argCheck.message);
+        return;
+    }
+
     message.channel.send({
         embed: {
             color: settings.embed.color,
@@ -23,9 +31,10 @@ module.exports.run = async (bot, logger, message) => {
     });
 };
 
-module.exports.help = {
+module.exports.settings = {
     names: ["userinfo"],
-    description: "Displays your userinfo",
+    description: "Displays your userinfo.",
     args: [],
+    example: "userinfo",
     enabled: false
 };

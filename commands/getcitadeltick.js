@@ -1,4 +1,4 @@
-const globalFunctions = require("../globalfunctions.js");
+const globalFunctions = require('../globalfunctions.js');
 
 module.exports.run = async (bot, logger, message) => {
     let messageArray = message.content.split(/\s+/g);
@@ -7,16 +7,24 @@ module.exports.run = async (bot, logger, message) => {
         message.channel.send(argCheck.message);
         return;
     }
+
     //Code to execute on command here
+    let tick = globalFunctions.getCitadelTick(message.guild.id);
+    if(!tick) {
+        message.channel.send("The citadel tick is not set");
+        return;
+    }
+
+    message.channel.send(`The citadel ticks on ${tick.day} at ${tick.time}`);
 };
 
 module.exports.settings = {
     //assuming prefix: !
     //names array lets you call this command by using either !name1 or !name2
-    names: ["name1", "name2"],
-    description: "",
+    names: ["getcitadeltick"],
+    description: "Gets when the citadel ticks.",
     args: [],
-    example: "",
+    example: "getCitadelTick",
     //command not loaded if set to false
-    enabled: false
+    enabled: true
 };
