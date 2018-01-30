@@ -28,7 +28,7 @@ module.exports.run = async (bot, logger, message) => {
             embed: {
                 color: settings.embed.color,
                 title: `The following people capped last week (${lastWeek.startOfWeek} to ${lastWeek.endOfWeek}):`,
-                description: `\n- ${lastWeek.cappedBy.map(c => `__${c.rsn}__ (${Moment(c.at).format("ddd HH:mm")}, logged by: *${c.loggedBy}*)`).join("\n- ")}`,
+                description: `The total amounts of caps was ${lastWeek.total}!\n\n- ${lastWeek.cappedBy.map(c => `__${c.rsn}__ (${Moment(c.at).format("ddd HH:mm")}, logged by: *${c.loggedBy}*)`).join("\n- ")}`,
                 timestamp: new Date()
             }
         });

@@ -33,10 +33,17 @@ module.exports.run = async (bot, logger, message) => {
 
         //read the capfile. Can guarantee the file exists, because we just created it if it didn't
         let capFile = require(`.${path}`);
+
         try {
-            //Code to execute on command here
             let currWeek = capFile.caps.find(c => c.currentWeek);
             let lastWeek = capFile.caps.find(c => c.lastWeek);
+
+            let capCountForRsn = currWeek.cappedBy.filter(c => c.rsn.toLowerCase() === args[0].toLowerCase()).length;
+            if(capCountForRsn > 0) {
+                message.channel.send(`${response.find(r => r.name.toLowerCase() === args[0].toLowerCase()).name}has already capped this week.`);
+                return;
+            }
+
             if (!currWeek) {
                 let tickdate = getTickDate(message.guild.id);
 
@@ -47,10 +54,10 @@ module.exports.run = async (bot, logger, message) => {
                     startOfWeek: tickdate.format("YYYY-MM-DD HH:mm"),
                     endOfWeek: tickdate.add(7, 'day').subtract(1, 'minute').format("YYYY-MM-DD HH:mm"),
                     cappedBy: [{
-                        rsn: response.find(r => r.name.toLowerCase() === args[0]).name,
+                        rsn: response.find(r => r.name.toLowerCase() === args[0].toLowerCase()).name,
                         rankAtMomentOfCap: response.find(r => r.name.toLowerCase() === args[0]).rank,
                         at: Moment().format("YYYY-MM-DD HH:mm"),
-                        loggedBy: response.find(r => r.name.toLowerCase() === args[1]).name
+                        loggedBy: response.find(r => r.name.toLowerCase() === args[1].toLowerCase()).name
                     }]
                 };
                 capFile.caps.push(newWeek);
@@ -89,7 +96,7 @@ module.exports.run = async (bot, logger, message) => {
             let jsonString = JSON.stringify(capFile, null, 3);
             fs.writeFile(path, jsonString, err => {
                 if (err) {
-                    message.channel.send(err + `Unable to add cap at the moment.`);
+                    message.channel.send(`Unable to add cap at the moment.`);
                     return;
                 }
 
