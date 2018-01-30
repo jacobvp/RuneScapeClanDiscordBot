@@ -1,5 +1,6 @@
 const globalFunctions = require("../globalfunctions.js");
 const fs = require("fs");
+const settings = require("../settings.json");
 
 module.exports.run = async (bot, logger, message) => {
     let messageArray = message.content.split(/\s+/g);
@@ -27,9 +28,27 @@ module.exports.run = async (bot, logger, message) => {
         //filter on the wanted rsn
         let filtered = flattened.filter(c => c === rsn.toLowerCase());
 
-        if(filtered.length === 0) throw new Error();
-        message.channel.send(`${rsn} has capped ${filtered.length} times!`);
-    } catch(err) {
+        if (filtered.length === 0) throw new Error();
+
+        globalFunctions.checkIfUsersInClanAndGetRank(message.guild.id, [rsn], (response) => {
+            let fields = [];
+            let title = `${rsn} has capped ${filtered.length} times!`;
+            if (response.some(r => r.result)) {
+                fields.push({
+                    name: "Rank",
+                    value: response[0].rank
+                });
+                title = `${response[0].name} has capped ${filtered.length} times!`;
+            }
+            message.channel.send({
+                embed: {
+                    color: settings.embed.color,
+                    title: title,
+                    fields: fields
+                }
+            });
+        });
+    } catch (err) {
         message.channel.send("No data found.");
     }
 };

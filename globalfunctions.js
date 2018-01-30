@@ -112,7 +112,7 @@ module.exports.checkIfUsersInClanAndGetRank = function (guildId, names, response
                 if (!resultArray.some(r => r.name.toLowerCase() === name.toLowerCase())) {
                     resultArray.push({
                         result: false,
-                        message: `${name} is not a member of ${clanname}`,
+                        message: `${name} is not a member of ${clanname.replace("+", " ")}`,
                         name: "",
                         rank: ""
                     });
