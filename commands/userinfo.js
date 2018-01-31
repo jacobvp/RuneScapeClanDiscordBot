@@ -26,7 +26,7 @@ module.exports.run = async (bot, logger, message) => {
                     value: message.author.createdAt
                 }
             ],
-            timestamp: new Date()
+            timestamp: globalFunctions.getUTCMoment()
         }
     });
 };

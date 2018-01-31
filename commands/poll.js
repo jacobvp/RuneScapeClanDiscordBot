@@ -44,7 +44,7 @@ module.exports.run = async (bot, logger, message) => {
                 title: `The poll regarding "${pollSubject}" has yielded no result.`,
                 description: `Nobody voted on the poll` +
                 `\n\n __Voting has been closed__`,
-                timestamp: new Date()
+                timestamp: globalFunctions.getUTCMoment()
             }
         });
         return;
@@ -58,7 +58,7 @@ module.exports.run = async (bot, logger, message) => {
             title: `The poll regarding "${pollSubject}" has ${(yesCount > noCount) ? "PASSED" : (yesCount == noCount) ? "DRAWED" : "FAILED"}.`,
             description: `The poll has ${(yesCount > noCount) ? "PASSED" : (yesCount == noCount) ? "DRAWED" : "FAILED"} with a pass-rate of ${(yesCount / (yesCount + noCount)) * 100}%` +
             `\n\n __Voting has been closed__`,
-            timestamp: new Date()
+            timestamp: globalFunctions.getUTCMoment()
         }
     });
 };

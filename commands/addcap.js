@@ -38,15 +38,8 @@ module.exports.run = async (bot, logger, message) => {
             let currWeek = capFile.caps.find(c => c.currentWeek);
             let lastWeek = capFile.caps.find(c => c.lastWeek);
 
-            let capCountForRsn = currWeek.cappedBy.filter(c => c.rsn.toLowerCase() === args[0].toLowerCase()).length;
-            if(capCountForRsn > 0) {
-                message.channel.send(`${response.find(r => r.name.toLowerCase() === args[0].toLowerCase()).name}has already capped this week.`);
-                return;
-            }
-
+            let tickdate = getTickDate(message.guild.id);
             if (!currWeek) {
-                let tickdate = getTickDate(message.guild.id);
-
                 let newWeek = {
                     currentWeek: true,
                     lastWeek: false,
@@ -56,42 +49,45 @@ module.exports.run = async (bot, logger, message) => {
                     cappedBy: [{
                         rsn: response.find(r => r.name.toLowerCase() === args[0].toLowerCase()).name,
                         rankAtMomentOfCap: response.find(r => r.name.toLowerCase() === args[0]).rank,
-                        at: Moment().format("YYYY-MM-DD HH:mm"),
+                        at: Moment().utc().format("YYYY-MM-DD HH:mm"),
                         loggedBy: response.find(r => r.name.toLowerCase() === args[1].toLowerCase()).name
                     }]
                 };
                 capFile.caps.push(newWeek);
             } else {
-                if(Moment(currWeek.endOfWeek) <= Moment()) {
+                if (Moment(currWeek.endOfWeek) <= globalFunctions.getUTCMoment()) {
                     currWeek.lastWeek = true;
                     currWeek.currentWeek = false;
 
-                    if(lastWeek) lastWeek.lastWeek = false;
+                    if (lastWeek) lastWeek.lastWeek = false;
 
                     let newWeek = {
                         currentWeek: true,
                         lastWeek: false,
-                        total: 1,
+                        total: 0,
                         startOfWeek: tickdate.format("YYYY-MM-DD HH:mm"),
                         endOfWeek: tickdate.add(7, 'day').subtract(1, 'minute').format("YYYY-MM-DD HH:mm"),
-                        cappedBy: [{
-                            rsn: response.find(r => r.name.toLowerCase() === args[0]).name,
-                            rankAtMomentOfCap: response.find(r => r.name.toLowerCase() === args[0]).rank,
-                            at: Moment().format("YYYY-MM-DD HH:mm"),
-                            loggedBy: response.find(r => r.name.toLowerCase() === args[1]).name
-                        }]
+                        cappedBy: []
                     };
                     capFile.caps.push(newWeek);
-                } else {
-                    currWeek.total += 1;
-                    currWeek.cappedBy.push({
-                        rsn: response.find(r => r.name.toLowerCase() === args[0]).name,
-                        rankAtMomentOfCap: response.find(r => r.name.toLowerCase() === args[0]).rank,
-                        at: Moment().format("YYYY-MM-DD HH:mm"),
-                        loggedBy: response.find(r => r.name.toLowerCase() === args[1]).name
-                    });
+                    currWeek = newWeek;
                 }
+
+                let capCountForRsn = currWeek.cappedBy.filter(c => c.rsn.toLowerCase() === args[0].toLowerCase()).length;
+                if (capCountForRsn > 0) {
+                    message.channel.send(`${response.find(r => r.name.toLowerCase() === args[0].toLowerCase()).name} has already capped this week.`);
+                    return;
+                }
+
+                currWeek.total += 1;
+                currWeek.cappedBy.push({
+                    rsn: response.find(r => r.name.toLowerCase() === args[0]).name,
+                    rankAtMomentOfCap: response.find(r => r.name.toLowerCase() === args[0]).rank,
+                    at: Moment().utc().format("YYYY-MM-DD HH:mm"),
+                    loggedBy: response.find(r => r.name.toLowerCase() === args[1]).name
+                });
             }
+
 
             let jsonString = JSON.stringify(capFile, null, 3);
             fs.writeFile(path, jsonString, err => {
@@ -146,7 +142,7 @@ function getTickDate(guildId) {
             dayint = 6;
             break;
     }
-    let tickdate = Moment().day(dayint).hour(tick.time.split(":")[0]).minute(tick.time.split(":")[1]);
-    if (tickdate > Moment()) tickdate = tickdate.subtract(1, "week");
+    let tickdate = Moment().utc().day(dayint).hour(tick.time.split(":")[0]).minute(tick.time.split(":")[1]);
+    if (tickdate > globalFunctions.getUTCMoment()) tickdate = tickdate.subtract(1, "week");
     return tickdate;
 }

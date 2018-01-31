@@ -2,6 +2,7 @@ const settings = require("./settings");
 const fs = require("fs");
 const request = require("request");
 const csv = require("csvtojson");
+const Moment = require("moment");
 
 module.exports.getPrefix = function (guildId) {
     //get default prefix
@@ -70,6 +71,18 @@ module.exports.checkArgumentCountAcceptable = function (messageArray, args, guil
     }
 
     return {result: true, message: ""};
+};
+
+/***
+ * Returns a moment using the utc time, beware that this doesn't convert the timezone. It is purely for date comparison
+ *
+ * @returns {moment} The moment containing the datetime as utc, but with the local timezone
+ */
+module.exports.getUTCMoment = function () {
+    let date = new Date();
+    let utc_date = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+    let moment = new Moment(utc_date);
+    return moment;
 };
 
 module.exports.checkIfUsersInClanAndGetRank = function (guildId, names, responseCallback) {

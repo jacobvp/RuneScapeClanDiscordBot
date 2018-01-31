@@ -46,7 +46,7 @@ module.exports.run = async (bot, logger, message) => {
             color: settings.embed.color,
             description: "The following commands are available",
             fields: fields,
-            timestamp: new Date()
+            timestamp: globalFunctions.getUTCMoment()
         }
     });
 };
